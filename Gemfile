@@ -9,3 +9,4 @@ git 'git://github.com/rails/rails.git', branch: 'master' do
 end
 
 gem 'activerecord-deprecated_finders', github: 'rails/activerecord-deprecated_finders', branch: 'master'
+gem 'protected_attributes'

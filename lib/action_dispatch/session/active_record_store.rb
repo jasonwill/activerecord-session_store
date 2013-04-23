@@ -61,6 +61,8 @@ module ActionDispatch
 
       private
         def get_session(env, sid)
+          ActiveRecord::Base.logger.debug("************** get_session ****************")
+          
           ActiveRecord::Base.logger.quietly do
             unless sid and session = @@session_class.find_by_session_id(sid)
               # If the sid was nil or if there is no pre-existing session under the sid,
@@ -74,6 +76,9 @@ module ActionDispatch
         end
 
         def set_session(env, sid, session_data, options)
+
+          ActiveRecord::Base.logger.debug("************** set_session ****************")
+
           ActiveRecord::Base.logger.quietly do
             record = get_session_model(env, sid)
             record.data = session_data
@@ -102,6 +107,8 @@ module ActionDispatch
         end
 
         def get_session_model(env, sid)
+          ActiveRecord::Base.logger.debug("************** get session model ****************")
+          
           if env[ENV_SESSION_OPTIONS_KEY][:id].nil?
             env[SESSION_RECORD_KEY] = find_session(sid)
           else
@@ -110,6 +117,8 @@ module ActionDispatch
         end
 
         def find_session(id)
+          ActiveRecord::Base.logger.debug("************** find session ****************")
+          
           @@session_class.find_by_session_id(id) ||
             @@session_class.new(:session_id => id, :data => {})
         end

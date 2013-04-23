@@ -3,11 +3,15 @@ module ActiveRecord
     # The default Active Record class.
     class Session < ActiveRecord::Base
       extend ClassMethods
+      require 'protected_attributes'
+      #include ActiveModel::MassAssignmentSecurity
 
       ##
       # :singleton-method:
       # Customizable data column name. Defaults to 'data'.
       cattr_accessor :data_column_name
+      attr_accessible :session_id
+      
       self.data_column_name = 'data'
 
       before_save :marshal_data!
@@ -20,6 +24,8 @@ module ActiveRecord
 
         # Hook to set up sessid compatibility.
         def find_by_session_id(session_id)
+          ActiveRecord::Base.logger.debug("************** find_by_session_id ****************")
+          
           Thread.exclusive { setup_sessid_compatibility! }
           find_by_session_id(session_id)
         end
@@ -31,6 +37,8 @@ module ActiveRecord
 
           # Compatibility with tables using sessid instead of session_id.
           def setup_sessid_compatibility!
+            ActiveRecord::Base.logger.debug("************** setup_sessid_compatibility ****************")
+            
             # Reset column info since it may be stale.
             reset_column_information
             if columns_hash['sessid']
@@ -51,6 +59,8 @@ module ActiveRecord
       end
 
       def initialize(attributes = nil)
+        ActiveRecord::Base.logger.debug("************** init session ****************")
+        ActiveRecord::Base.logger.debug(attributes.inspect)
         @data = nil
         super
       end
@@ -64,12 +74,19 @@ module ActiveRecord
 
       # Has the session been loaded yet?
       def loaded?
+        ActiveRecord::Base.logger.debug("************** session loaded ****************")
+        
         @data
       end
 
       private
         def marshal_data!
+          ActiveRecord::Base.logger.debug("************** marshal check ****************")
+            ActiveRecord::Base.logger.debug(loaded?)
+          
           return false unless loaded?
+          ActiveRecord::Base.logger.debug("************** marshal loaded ****************")
+          
           write_attribute(@@data_column_name, self.class.marshal(data))
         end
 
